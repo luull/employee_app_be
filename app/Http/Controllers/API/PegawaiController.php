@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Pegawai;
+use Illuminate\Support\Facades\Validator;
 class PegawaiController extends Controller
 {
     public function index()
@@ -17,11 +18,17 @@ class PegawaiController extends Controller
     }
     public function create(Request $request)
     {
-        $this->validate($request, [
-            'nama' => ['string', 'required', 'max:25'],
-            'jab_id' => 'required',
-            'kon_id' => 'required',
+        $validator = Validator::make($request->all(), [
+            'nama' => ['required','string', 'max:25'],
+            'jab_id' => ['required','not_in:0'],
+            'kon_id' => ['required','not_in:0'],
         ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'error',
+                'data' => $validator->errors(), 422
+            ]);
+        }
         $rslt = Pegawai::create([
             'nama' => $request->nama,
             'jab_id' => $request->jab_id,
@@ -57,11 +64,17 @@ class PegawaiController extends Controller
     }
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
-            'nama' => ['string', 'required', 'max:25'],
-            'jab_id' => 'required',
-            'kon_id' => 'required',
+        $validator = Validator::make($request->all(), [
+            'nama' => ['required','string', 'max:25'],
+            'jab_id' => ['required','not_in:0'],
+            'kon_id' => ['required','not_in:0'],
         ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'error',
+                'data' => $validator->errors(), 422
+            ]);
+        }
         $rslt = Pegawai::where('id', $id)->update([
             'nama' => $request->nama,
             'jab_id' => $request->jab_id,
